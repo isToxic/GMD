@@ -3,7 +3,6 @@ package is.toxic.GMD.service;
 import is.toxic.GMD.DTO.Email;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -15,7 +14,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GosbaseService {
@@ -48,11 +46,11 @@ public class GosbaseService {
     }
 
     @NonNull
-    public List<Email> getMails(@NonNull GosbaseTradeResponse response){
+    public String getEmail(@NonNull GosbaseTradeResponse response){
         return response
                 .getEgrul()
                 .getContacts()
-                .getEmails();
+                .getActualEmailString();
     }
 
 }

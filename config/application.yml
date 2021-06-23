@@ -11,3 +11,4 @@ spring:
           starttls.enable: true
 GMD:
   apikey: d428e943654ed9c66a1b22ca8fece014
+  mail-subject: offer

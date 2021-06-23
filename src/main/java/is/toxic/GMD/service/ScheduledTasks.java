@@ -30,7 +30,7 @@ public class ScheduledTasks {
             value.getAndIncrement();
             Arrays.stream(trades)
                     .forEach(trade ->
-                            sendingService.sendMail(gosbaseService.getMails(trade),
+                            sendingService.sendMail(gosbaseService.getEmail(trade),
                                     gosbaseService.getFIO(trade),
                                     mailSubject
                             )
@@ -38,7 +38,6 @@ public class ScheduledTasks {
             trades = gosbaseService.getTradesPage(value.get());
         }
     }
-
 
     @Scheduled(cron = "0 0 * * * *")
     public void dropActualPageNum() {
