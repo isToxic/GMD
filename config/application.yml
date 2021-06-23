@@ -1,0 +1,13 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: s.b.mokrov@gmail.com
+    password: D13N0tN0w
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+GMD:
+  apikey: d428e943654ed9c66a1b22ca8fece014
