@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -37,8 +39,9 @@ public class GosbaseService {
                 .build();
 
         log.info("getting gosbase info page: {}", page);
-        return template.exchange(requestEntity, GosbaseTradeResponse[].class)
-                .getBody();
+        GosbaseTradeResponse[] result = template.exchange(requestEntity, GosbaseTradeResponse[].class).getBody();
+        log.info("get {} trades", Objects.requireNonNull(result).length);
+        return result;
     }
 
     @NonNull
