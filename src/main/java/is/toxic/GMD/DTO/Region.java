@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class Region{
-    public Object id;
-    public String timezone;
-    public String name;
-    public String localtime;
+    private Object id;
+    private String timezone;
+    private String name;
+    private String localtime;
 }

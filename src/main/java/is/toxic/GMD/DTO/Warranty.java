@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Warranty{
-    public int purchasesId;
-    public int warranty_size;
-    public Object advance;
+    private int purchasesId;
+    private int warranty_size;
+    private Object advance;
 }

@@ -7,8 +7,8 @@ import java.util.List;
 
 @Data
 public class Contacts{
-    public List<Phone> phones;
-    public List<Email> emails;
+    private List<Phone> phones;
+    private List<Email> emails;
 
     public String getActualEmailString(){
         return emails.stream()

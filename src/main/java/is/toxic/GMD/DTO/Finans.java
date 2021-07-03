@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class Finans{
-    public int proceeds;
-    public int profit;
-    public int valbal;
-    public int year;
+    private int proceeds;
+    private int profit;
+    private int valbal;
+    private int year;
 }

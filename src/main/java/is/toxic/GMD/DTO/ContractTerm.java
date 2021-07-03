@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ContractTerm{
-    public String text;
-    public String date;
+    private String text;
+    private String date;
 }

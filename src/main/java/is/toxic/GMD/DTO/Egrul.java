@@ -4,20 +4,20 @@ import lombok.Data;
 
 @Data
 public class Egrul{
-    public String inn;
-    public String kpp;
-    public String shortname;
-    public String fullname;
-    public String fio;
-    public String regdate;
-    public String ogrn;
-    public String address;
-    public String oktmo;
-    public String okato;
-    public String okved;
-    public String okpo;
-    public String msp_date;
-    public Contacts contacts;
-    public Finans finans;
-    public Region region;
+    private String inn;
+    private String kpp;
+    private String shortname;
+    private String fullname;
+    private String fio;
+    private String regdate;
+    private String ogrn;
+    private String address;
+    private String oktmo;
+    private String okato;
+    private String okved;
+    private String okpo;
+    private String msp_date;
+    private Contacts contacts;
+    private Finans finans;
+    private Region region;
 }

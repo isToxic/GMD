@@ -20,14 +20,18 @@ repositories {
 
 dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
-	compileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	compileOnly 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
 
 	implementation 'io.vavr:vavr:0.10.3'
 	implementation 'org.apache.httpcomponents:httpclient'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation group: 'com.icegreen', name: 'greenmail', version: '1.6.4'
 }
 
 test {

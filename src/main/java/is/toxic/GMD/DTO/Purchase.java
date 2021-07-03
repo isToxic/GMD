@@ -4,22 +4,22 @@ import lombok.Data;
 
 @Data
 public class Purchase{
-    public String notificationNumber;
-    public int lotNumber;
-    public String purchaseObjectInfo;
-    public String maxprice;
-    public String guarantee;
-    public String appguarantee;
-    public String publishDate;
-    public String endDate;
-    public String lowPrice;
-    public String href;
-    public int fz;
-    public String mainokpd2;
-    public Customer customer;
-    public Warranty warranty;
-    public String neuralNetworkId;
-    public String deliveryTerm;
-    public String deliveryDate;
-    public Auktype auktype;
+    private String notificationNumber;
+    private int lotNumber;
+    private String purchaseObjectInfo;
+    private String maxprice;
+    private String guarantee;
+    private String appguarantee;
+    private String publishDate;
+    private String endDate;
+    private String lowPrice;
+    private String href;
+    private int fz;
+    private String mainokpd2;
+    private Customer customer;
+    private Warranty warranty;
+    private String neuralNetworkId;
+    private String deliveryTerm;
+    private String deliveryDate;
+    private Auktype auktype;
 }

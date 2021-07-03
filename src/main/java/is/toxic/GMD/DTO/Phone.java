@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Phone{
-    public String phone;
-    public String actual_date;
+    private String phone;
+    private String actual_date;
 }

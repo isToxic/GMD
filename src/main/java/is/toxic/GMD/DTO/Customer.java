@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class Customer{
-    public String placerRegNum;
-    public String fullName;
-    public String shortName;
-    public String inn;
-    public String kpp;
-    public Region region;
+    private String placerRegNum;
+    private String fullName;
+    private String shortName;
+    private String inn;
+    private String kpp;
+    private Region region;
 }

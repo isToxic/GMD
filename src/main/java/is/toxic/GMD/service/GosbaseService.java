@@ -1,8 +1,8 @@
 package is.toxic.GMD.service;
 
-import is.toxic.GMD.DTO.Email;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -12,20 +12,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GosbaseService {
     private final RestTemplate template;
     private final String SORT = "last_update";
 
+    @Value("${GMD.gosbase-url}")
+    private String url;
+
     @Value("${GMD.apikey}")
     private String apikey;
 
 
     public GosbaseTradeResponse[] getTradesPage(int page) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://gosbase.ru/v1/api/online/");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
         builder.queryParam("page", page);
         builder.queryParam("key", apikey);
         builder.queryParam("sort", SORT);
@@ -34,23 +36,33 @@ public class GosbaseService {
                 .method(HttpMethod.GET, builder.build().toUri())
                 .build();
 
+        log.info("getting gosbase info page: {}", page);
         return template.exchange(requestEntity, GosbaseTradeResponse[].class)
                 .getBody();
     }
 
     @NonNull
-    public String getFIO(@NonNull GosbaseTradeResponse response){
+    public String getFIO(@NonNull GosbaseTradeResponse response) {
+        log.info("get fio: {}", response.getEgrul().getFio());
         return response
                 .getEgrul()
                 .getFio();
     }
 
     @NonNull
-    public String getEmail(@NonNull GosbaseTradeResponse response){
+    public String getFirmName(@NonNull GosbaseTradeResponse response) {
+        log.info("get firm name: {}", response.getEgrul().getShortname());
+        return response
+                .getEgrul()
+                .getShortname();
+    }
+
+    @NonNull
+    public String getEmail(@NonNull GosbaseTradeResponse response) {
+        log.info("get email: {}", response.getEgrul().getContacts().getActualEmailString());
         return response
                 .getEgrul()
                 .getContacts()
                 .getActualEmailString();
     }
-
 }

@@ -6,6 +6,6 @@ import java.time.LocalDate;
 
 @Data
 public class Email{
-    public String email;
-    public LocalDate actual_date;
+    private String email;
+    private LocalDate actual_date;
 }

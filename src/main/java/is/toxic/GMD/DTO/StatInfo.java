@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class StatInfo{
-    public int wins;
-    public int apps;
-    public String guaranteeings;
+    private int wins;
+    private int apps;
+    private String guaranteeings;
 }
