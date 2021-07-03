@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @AutoConfigureWebClient
 @AutoConfigureMockRestServiceServer
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestPropertySource(value = "file:src/test/resources/application.yml")
 @SpringBootTest(classes = {GosbaseMailDistributorApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

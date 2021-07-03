@@ -13,11 +13,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.mail.internet.MimeMessage;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(value = "file:src/test/resources/application.yml")
 @SpringBootTest(classes = {GosbaseMailDistributorApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class MailSendingServiceTest {
@@ -39,7 +41,7 @@ public class MailSendingServiceTest {
     }
 
     @Test
-    public void test() {
+    public void sendMailTest() {
         String to = RandomString.make().concat("@gmail.com");
         String firmName = RandomString.make();
         String fio = RandomString.make().concat(" ").concat(RandomString.make()).concat(" ").concat(RandomString.make());
