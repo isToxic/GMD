@@ -25,7 +25,7 @@ public class MailSendingService {
         message.setTo(to);
         message.setSubject(resourceReader.getSubject(firmName));
         message.setText(resourceReader.getMailMessage(fio));
-        log.info("Send email message:\nTo:{},\nSubject:{},\nMessage:{}", to, message.getSubject(), message.getText());
+        log.info("Send email message:\nFrom:{},\nTo:{},\nSubject:{},\nMessage:{}", from, to, message.getSubject(), message.getText());
         emailSender.send(message);
     }
 }
