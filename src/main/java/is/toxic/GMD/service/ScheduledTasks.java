@@ -24,7 +24,7 @@ public class ScheduledTasks {
     private final MailSendingService sendingService;
     private final GosbaseService gosbaseService;
 
-    @Scheduled(cron = "0 */10 * * * *", zone="Europe/Moscow")
+    @Scheduled(cron = "0 */10 * * * *")
     public void distributeOffers() {
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
@@ -43,7 +43,7 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0 * * * *", zone="Europe/Moscow")
     public void dropActualPageNum() {
         log.info("reset pages num to 0");
         value.set(0);
