@@ -24,7 +24,7 @@ public class ScheduledTasks {
     private final MailSendingService sendingService;
     private final GosbaseService gosbaseService;
 
-    @Scheduled(cron = "0 */5 * * * *", zone="Europe/Moscow")
+    @Scheduled(cron = "0 */10 * * * *", zone="Europe/Moscow")
     public void distributeOffers() {
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
