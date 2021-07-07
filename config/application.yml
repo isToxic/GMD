@@ -9,6 +9,19 @@ spring:
         smtp:
           auth: true
           starttls.enable: true
+logging:
+  #file: /var/log/mail-sender
+  level:
+    org.springframework: info
+    org.apache.http: info
+    is.toxic: info
+    org.springframework.integration.handler.LoggingHandler: off
+  file:
+    name: /opt/GMD/logs
+  logback:
+    rollingpolicy:
+      max-file-size: 20MB
+      max-history: 30
 GMD:
   gosbase-url: https://gosbase.ru/v1/api/online/
   distribution-on: true
