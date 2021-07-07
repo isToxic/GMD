@@ -37,7 +37,9 @@ public class MailSendingService {
     @NonNull
     private SimpleMailMessage[] getMessagesForSend(GosbaseTradeResponse... tradeResponses){
         List<SimpleMailMessage> result = new ArrayList<>();
-        AtomicInteger errors = new AtomicInteger();
+        AtomicInteger mailErrors = new AtomicInteger();
+        AtomicInteger subErrors = new AtomicInteger();
+        AtomicInteger textErrors = new AtomicInteger();
         Arrays.stream(tradeResponses)
                 .parallel()
                 .forEach(trade ->
@@ -55,7 +57,15 @@ public class MailSendingService {
                                 SimpleMailMessage mess = getMimeMessage(mail, subject, text);
                                 result.add(mess);
                             } else {
-                                errors.getAndIncrement();
+                                if (!subject.equals("")){
+                                    subErrors.getAndIncrement();
+                                }
+                                if (!mail.equals("")){
+                                    mailErrors.getAndIncrement();
+                                }
+                                if (!text.equals("")){
+                                    textErrors.getAndIncrement();
+                                }
                                 log.error("Error creating message for trade egrul: {}",
                                         trade.getEgrul() == null ? "null" : trade.getEgrul().toString()
                                 );
@@ -63,8 +73,9 @@ public class MailSendingService {
                             }
                         }).getOrNull()
                 );
+        log.info("For create prepare: {}", tradeResponses.length);
         log.info("Create {} messages for sending", result.size());
-        log.info("Errors for data: {}", errors.get());
+        log.info("Errors for data: text={}, mail={}, subject={}", textErrors.get(), mailErrors.get(), subErrors.get());
         return result.toArray(new SimpleMailMessage[0]);
     }
 
