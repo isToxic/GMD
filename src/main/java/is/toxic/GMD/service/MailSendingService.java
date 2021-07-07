@@ -29,14 +29,21 @@ public class MailSendingService {
     private String from;
 
     public void sendMail(GosbaseTradeResponse... tradeResponses) {
-        Try.run(() -> emailSender.send(getMessagesForSend(tradeResponses)))
-                .onSuccess(unused -> log.info("Succesfully send messages to server"))
+        Try.of(() -> getMessagesForSend(tradeResponses))
+                .andThen(simpleMailMessages ->
+                        simpleMailMessages.forEach(simpleMailMessage ->
+                                Try.run(() -> Thread.sleep(1500L))
+                                        .andThen(() -> emailSender.send(simpleMailMessage))
+                                        .onSuccess(unused -> log.info("Success send message to server"))
+                                        .get())
+                )
+                .onSuccess(unused -> log.info("Success send all messages to server"))
                 .onFailure(throwable -> log.error("Error for sending message", throwable))
                 .get();
     }
 
     @NonNull
-    private SimpleMailMessage[] getMessagesForSend(GosbaseTradeResponse... tradeResponses){
+    private List<SimpleMailMessage> getMessagesForSend(GosbaseTradeResponse... tradeResponses){
         List<SimpleMailMessage> result = new ArrayList<>();
         AtomicInteger mailErrors = new AtomicInteger();
         AtomicInteger subErrors = new AtomicInteger();
@@ -77,7 +84,7 @@ public class MailSendingService {
         log.info("For create prepare: {}", tradeResponses.length);
         log.info("Errors for data: text={}, mail={}, subject={}", textErrors.get(), mailErrors.get(), subErrors.get());
         log.info("Create {} messages for sending", result.size());
-        return result.toArray(new SimpleMailMessage[0]);
+        return result;
     }
 
     @NonNull
