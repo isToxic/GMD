@@ -1,6 +1,5 @@
 package is.toxic.GMD.service;
 
-import io.vavr.control.Try;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -25,13 +26,15 @@ public class ScheduledTasks {
 
     @Scheduled(cron = "0 */10 * * * *")
     public void distributeOffers() {
+        List<GosbaseTradeResponse> messages = new ArrayList<>();
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
             value.getAndIncrement();
-            GosbaseTradeResponse[] finalTrades = trades;
-            Try.runRunnable(()->sendingService.sendMail(finalTrades)).getOrNull();
+            messages.addAll(List.of(trades));
             trades = gosbaseService.getTradesPage(value.get());
         }
+        log.info("Start preparing messages for sending: {}", messages.size());
+        sendingService.sendMail(messages.toArray(messages.toArray(new GosbaseTradeResponse[0])));
     }
 
     @Scheduled(cron = "0 0 * * * *", zone = "Europe/Moscow")

@@ -21,8 +21,8 @@ public class ResourceReader {
     private String mailSubject;
 
     @NonNull
-    public String getMailMessage(String fio) {
-        if (fio == null || fio.isBlank()){
+    public String getMailMessage(@NonNull String fio) {
+        if (fio.isBlank()){
             return offerText().replace("IO", "уважаемый директор, предпрениматель");
         }
         String[] fioArray = fio.split(" ");

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -36,27 +37,35 @@ public class MailSendingService {
     @NonNull
     private SimpleMailMessage[] getMessagesForSend(GosbaseTradeResponse... tradeResponses){
         List<SimpleMailMessage> result = new ArrayList<>();
+        AtomicInteger errors = new AtomicInteger();
         Arrays.stream(tradeResponses)
                 .parallel()
                 .forEach(trade ->
                         Try.runRunnable(() -> {
-                                    String subject = Try.of(() -> resourceReader.getSubject(getFirmName(trade)))
+                            String mail = Try.of(() -> getEmail(trade))
+                                    .onFailure(throwable -> log.error("Error for getting email", throwable))
+                                    .getOrElse("");
+                            String subject = Try.of(() -> resourceReader.getSubject(getFirmName(trade)))
                                             .onFailure(throwable -> log.error("Error for getting subject", throwable))
                                             .getOrElse("");
-                                    String text = Try.of(() -> resourceReader.getMailMessage(getFIO(trade)))
+                            String text = Try.of(() -> resourceReader.getMailMessage(getFIO(trade)))
                                             .onFailure(throwable -> log.error("Error for getting text", throwable))
                                             .getOrElse("");
-                                    if (!subject.equals("") && !text.equals("")) {
-                                        SimpleMailMessage mess = getMimeMessage(getEmail(trade), subject, text);
-                                        result.add(mess);
-                                    } else {
-                                        log.error("Error creating message for trade egrul: {}", trade.getEgrul().toString());
-                                        log.error("Subject = {}, Text = /n{}", subject, text);
-                                    }
-                                }
-                        ).getOrNull()
+                            if (!subject.equals("") && !text.equals("") && !mail.equals("")) {
+                                SimpleMailMessage mess = getMimeMessage(mail, subject, text);
+                                result.add(mess);
+                            } else {
+                                errors.getAndIncrement();
+                                log.error("Error creating message for trade egrul: {}",
+                                        trade.getEgrul() == null ? "null" : trade.getEgrul().toString()
+                                );
+                                log.error("Mail ={},Subject = {}, Text =\n{}",mail, subject, text);
+                            }
+                        }).getOrNull()
                 );
-        return result.toArray(new SimpleMailMessage[result.size()]);
+        log.info("Create {} messages for sending", result.size());
+        log.info("Errors for data: {}", errors.get());
+        return result.toArray(new SimpleMailMessage[0]);
     }
 
     @NonNull
@@ -74,18 +83,25 @@ public class MailSendingService {
 
     @NonNull
     public String getFIO(@NonNull GosbaseTradeResponse response) {
-        String fio = response.getEgrul() == null || response.getEgrul().getFio() == null
-                || response.getEgrul().getFio().isBlank()
-                ?
-                getFirmName(response).replace("ИП ", "").replace("\"", "")
-                :
-                response.getEgrul().getFio();
+        String fio;
+        if (response.getEgrul() == null || response.getEgrul().getFio() == null || response.getEgrul().getFio().isBlank()) {
+            fio = getFirmName(response);
+            if (fio.contains("ИП")) {
+                fio = fio.replace("ИП ", "").replace("\"", "");
+            } else {
+                return "";
+            }
+        }
+        else fio = response.getEgrul().getFio();
         final String[] result = {""};
         List<String> fios = List.of(fio.split(" "));
-        log.info(Arrays.toString(fios.toArray()));
         List<String> fiosLower= new ArrayList<>();
         fios.forEach(name -> fiosLower.add(name.toLowerCase(Locale.ROOT)));
-        fiosLower.forEach(name -> result[0] += name.replaceFirst(name.substring(0,1), name.substring(0,1).toUpperCase(Locale.ROOT)).concat(" "));
+        fiosLower.forEach(name ->
+                result[0] += Try.of(()->
+                        name.replaceFirst(name.substring(0,1),
+                                name.substring(0,1).toUpperCase(Locale.ROOT)).concat(" ")
+                ).getOrElse(""));
 
         log.debug("get fio: {}", result[0]);
         return result[0];
