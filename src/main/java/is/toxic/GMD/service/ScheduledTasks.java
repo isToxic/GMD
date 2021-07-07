@@ -30,9 +30,11 @@ public class ScheduledTasks {
             value.getAndIncrement();
             Arrays.stream(trades)
                     .forEach(trade ->
-                            sendingService.sendMail(gosbaseService.getEmail(trade),
-                                    gosbaseService.getFIO(trade),
-                                    gosbaseService.getFirmName(trade)
+                            sendingService.sendMail(
+                                    gosbaseService.getEmail(trade),
+                                    gosbaseService.getFirmName(trade),
+                                    gosbaseService.getFIO(trade)
+
                             )
                     );
             trades = gosbaseService.getTradesPage(value.get());
