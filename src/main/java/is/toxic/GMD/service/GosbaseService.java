@@ -3,6 +3,7 @@ package is.toxic.GMD.service;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -49,7 +50,18 @@ public class GosbaseService {
         log.info("get fio: {}", response.getEgrul().getFio());
         return response
                 .getEgrul()
-                .getFio();
+                .getFio() == null
+                || response
+                .getEgrul()
+                .getFio().isBlank()
+                ?
+                getFirmName(response)
+                        .replace("ИП ", "")
+                        .replace("\"", "")
+                :
+                response
+                        .getEgrul()
+                        .getFio();
     }
 
     @NonNull
