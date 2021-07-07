@@ -30,6 +30,7 @@ public class MailSendingService {
 
     public void sendMail(GosbaseTradeResponse... tradeResponses) {
         Try.run(() -> emailSender.send(getMessagesForSend(tradeResponses)))
+                .onSuccess(unused -> log.info("Succesfully send messages to server"))
                 .onFailure(throwable -> log.error("Error for sending message", throwable))
                 .get();
     }
@@ -74,8 +75,8 @@ public class MailSendingService {
                         }).getOrNull()
                 );
         log.info("For create prepare: {}", tradeResponses.length);
-        log.info("Create {} messages for sending", result.size());
         log.info("Errors for data: text={}, mail={}, subject={}", textErrors.get(), mailErrors.get(), subErrors.get());
+        log.info("Create {} messages for sending", result.size());
         return result.toArray(new SimpleMailMessage[0]);
     }
 
@@ -93,7 +94,7 @@ public class MailSendingService {
 
 
     @NonNull
-    public String getFIO(@NonNull GosbaseTradeResponse response) {
+    private String getFIO(@NonNull GosbaseTradeResponse response) {
         String fio;
         if (response.getEgrul() == null || response.getEgrul().getFio() == null || response.getEgrul().getFio().isBlank()) {
             fio = getFirmName(response);
@@ -119,7 +120,7 @@ public class MailSendingService {
     }
 
     @NonNull
-    public String getFirmName(@NonNull GosbaseTradeResponse response) {
+    private String getFirmName(@NonNull GosbaseTradeResponse response) {
         String firmName = response.getEgrul() == null
                 ||  response.getEgrul().getShortname() == null
                 || response.getEgrul().getShortname().isBlank()
@@ -130,7 +131,7 @@ public class MailSendingService {
     }
 
     @NonNull
-    public String getEmail(@NonNull GosbaseTradeResponse response) {
+    private String getEmail(@NonNull GosbaseTradeResponse response) {
         log.debug("get email: {}", response.getEgrul().getContacts().getActualEmailString());
         return response
                 .getEgrul()
