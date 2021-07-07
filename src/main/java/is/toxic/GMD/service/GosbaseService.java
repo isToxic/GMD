@@ -47,21 +47,14 @@ public class GosbaseService {
 
     @NonNull
     public String getFIO(@NonNull GosbaseTradeResponse response) {
-        log.info("get fio: {}", response.getEgrul().getFio());
-        return response
-                .getEgrul()
-                .getFio() == null
-                || response
-                .getEgrul()
-                .getFio().isBlank()
+        String result = response.getEgrul().getFio() == null
+                || response.getEgrul().getFio().isBlank()
                 ?
-                getFirmName(response)
-                        .replace("ИП ", "")
-                        .replace("\"", "")
+                getFirmName(response).replace("ИП ", "").replace("\"", "")
                 :
-                response
-                        .getEgrul()
-                        .getFio();
+                response.getEgrul().getFio();
+        log.info("get fio: {}", result);
+        return result;
     }
 
     @NonNull
