@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -56,8 +54,11 @@ public class GosbaseService {
                 :
                 response.getEgrul().getFio();
         final String[] result = {""};
-        String[] fios = fio.split(" ");
-        Arrays.stream(fios).forEach(name -> result[0] += name.toLowerCase(Locale.ROOT).replaceFirst(name.substring(0,1), name.substring(0,1).toUpperCase(Locale.ROOT)).concat(" "));
+        List<String> fios = List.of(fio.split(" "));
+        List<String> fiosLower= new ArrayList<>();
+        fios.forEach(name -> fiosLower.add(name.toLowerCase(Locale.ROOT)));
+        fiosLower.forEach(name -> result[0] += name.replaceFirst(name.substring(0,1), name.substring(0,1).toUpperCase(Locale.ROOT)).concat(" "));
+
         log.info("get fio: {}", result[0]);
         return result[0];
     }
