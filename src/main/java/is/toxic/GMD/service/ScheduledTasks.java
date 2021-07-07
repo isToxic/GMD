@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -29,21 +28,13 @@ public class ScheduledTasks {
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
             value.getAndIncrement();
-            Arrays.stream(trades)
-                    .parallel()
-                    .forEach(trade ->
-                            Try.runRunnable(() ->
-                            sendingService.sendMail(
-                                    gosbaseService.getEmail(trade),
-                                    gosbaseService.getFirmName(trade),
-                                    gosbaseService.getFIO(trade))
-                            ).getOrNull()
-                    );
+            GosbaseTradeResponse[] finalTrades = trades;
+            Try.runRunnable(()->sendingService.sendMail(finalTrades)).getOrNull();
             trades = gosbaseService.getTradesPage(value.get());
         }
     }
 
-    @Scheduled(cron = "0 0 * * * *", zone="Europe/Moscow")
+    @Scheduled(cron = "0 0 * * * *", zone = "Europe/Moscow")
     public void dropActualPageNum() {
         log.info("reset pages num to 0");
         value.set(0);

@@ -45,38 +45,4 @@ public class GosbaseService {
         return result;
     }
 
-    @NonNull
-    public String getFIO(@NonNull GosbaseTradeResponse response) {
-        String fio = response.getEgrul().getFio() == null
-                || response.getEgrul().getFio().isBlank()
-                ?
-                getFirmName(response).replace("ИП ", "").replace("\"", "")
-                :
-                response.getEgrul().getFio();
-        final String[] result = {""};
-        List<String> fios = List.of(fio.split(" "));
-        List<String> fiosLower= new ArrayList<>();
-        fios.forEach(name -> fiosLower.add(name.toLowerCase(Locale.ROOT)));
-        fiosLower.forEach(name -> result[0] += name.replaceFirst(name.substring(0,1), name.substring(0,1).toUpperCase(Locale.ROOT)).concat(" "));
-
-        log.info("get fio: {}", result[0]);
-        return result[0];
-    }
-
-    @NonNull
-    public String getFirmName(@NonNull GosbaseTradeResponse response) {
-        log.info("get firm name: {}", response.getEgrul().getShortname());
-        return response
-                .getEgrul()
-                .getShortname();
-    }
-
-    @NonNull
-    public String getEmail(@NonNull GosbaseTradeResponse response) {
-        log.info("get email: {}", response.getEgrul().getContacts().getActualEmailString());
-        return response
-                .getEgrul()
-                .getContacts()
-                .getActualEmailString();
-    }
 }

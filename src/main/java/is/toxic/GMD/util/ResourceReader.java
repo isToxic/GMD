@@ -2,6 +2,7 @@ package is.toxic.GMD.util;
 
 import io.vavr.control.Try;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -20,14 +21,16 @@ public class ResourceReader {
     private String mailSubject;
 
     @NonNull
-    public String getMailMessage(@NonNull String fio) {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("file:config/offer.txt");
+    public String getMailMessage(String fio) {
+        if (fio == null || fio.isBlank()){
+            return offerText().replace("IO", "уважаемый директор, предпрениматель");
+        }
         String[] fioArray = fio.split(" ");
-        return asString(resource).replace("IO", fioArray[1].concat(" ").concat(fioArray[2]));
+        String replaceResult = Try.of(()->fioArray[1].concat(" ").concat(fioArray[2])).getOrElse("уважаемый директор, предпрениматель");
+        return offerText().replace("IO", replaceResult);
     }
 
-    public String getSubject(String firmName) {
+    public String getSubject(@NonNull String firmName) {
         return mailSubject.replace("FIRM_NAME", firmName);
     }
 
@@ -36,5 +39,13 @@ public class ResourceReader {
         return Try.of(() -> FileCopyUtils.copyToString(
                 Try.of(() -> new InputStreamReader(resource.getInputStream(), UTF_8)).get())
         ).get();
+    }
+
+
+    @Bean
+    public String offerText(){
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("file:config/offer.txt");
+        return asString(resource);
     }
 }

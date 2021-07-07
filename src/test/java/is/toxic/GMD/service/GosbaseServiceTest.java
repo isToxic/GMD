@@ -51,38 +51,38 @@ public class GosbaseServiceTest {
     @Value("${GMD.gosbase-url}")
     private String url;
 
-    @Test
-    public void getEmailTest() {
-        GosbaseTradeResponse response = generateResponse();
-        String testEmail = response
-                .getEgrul()
-                .getContacts()
-                .getEmails()
-                .get(0)
-                .getEmail();
-
-        String result = gosbaseService.getEmail(response);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(testEmail, result);
-    }
-
-    @Test
-    public void getFioTest() {
-        GosbaseTradeResponse response = generateResponse();
-        String testFio = response.getEgrul().getFio();
-        String result = gosbaseService.getFIO(response);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(testFio, result);
-    }
-
-    @Test
-    public void getFirmNameTest() {
-        GosbaseTradeResponse response = generateResponse();
-        String testName = response.getEgrul().getShortname();
-        String result = gosbaseService.getFirmName(response);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(testName, result);
-    }
+//    @Test
+//    public void getEmailTest() {
+//        GosbaseTradeResponse response = generateResponse();
+//        String testEmail = response
+//                .getEgrul()
+//                .getContacts()
+//                .getEmails()
+//                .get(0)
+//                .getEmail();
+//
+//        String result = gosbaseService.getEmail(response);
+//        Assertions.assertNotNull(result);
+//        Assertions.assertEquals(testEmail, result);
+//    }
+//
+//    @Test
+//    public void getFioTest() {
+//        GosbaseTradeResponse response = generateResponse();
+//        String testFio = response.getEgrul().getFio();
+//        String result = gosbaseService.getFIO(response);
+//        Assertions.assertNotNull(result);
+//        Assertions.assertEquals(testFio, result);
+//    }
+//
+//    @Test
+//    public void getFirmNameTest() {
+//        GosbaseTradeResponse response = generateResponse();
+//        String testName = response.getEgrul().getShortname();
+//        String result = gosbaseService.getFirmName(response);
+//        Assertions.assertNotNull(result);
+//        Assertions.assertEquals(testName, result);
+//    }
 
     @Test
     public void getTradesPageTest() throws JsonProcessingException {
