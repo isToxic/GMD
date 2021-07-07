@@ -58,13 +58,13 @@ public class MailSendingService {
                                 SimpleMailMessage mess = getMimeMessage(mail, subject, text);
                                 result.add(mess);
                             } else {
-                                if (!subject.equals("")){
+                                if (subject.equals("")){
                                     subErrors.getAndIncrement();
                                 }
-                                if (!mail.equals("")){
+                                if (mail.equals("")){
                                     mailErrors.getAndIncrement();
                                 }
-                                if (!text.equals("")){
+                                if (text.equals("")){
                                     textErrors.getAndIncrement();
                                 }
                                 log.error("Error creating message for trade egrul: {}",
