@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Objects;
 
 @Slf4j
@@ -47,14 +49,17 @@ public class GosbaseService {
 
     @NonNull
     public String getFIO(@NonNull GosbaseTradeResponse response) {
-        String result = response.getEgrul().getFio() == null
+        String fio = response.getEgrul().getFio() == null
                 || response.getEgrul().getFio().isBlank()
                 ?
                 getFirmName(response).replace("ИП ", "").replace("\"", "")
                 :
                 response.getEgrul().getFio();
-        log.info("get fio: {}", result);
-        return result;
+        final String[] result = {""};
+        String[] fios = fio.split(" ");
+        Arrays.stream(fios).forEach(name -> result[0] += name.toLowerCase(Locale.ROOT).replaceFirst(name.substring(0,1), name.substring(0,1).toUpperCase(Locale.ROOT)).concat(" "));
+        log.info("get fio: {}", result[0]);
+        return result[0];
     }
 
     @NonNull
