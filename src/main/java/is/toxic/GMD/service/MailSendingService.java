@@ -1,5 +1,6 @@
 package is.toxic.GMD.service;
 
+import io.vavr.control.Try;
 import is.toxic.GMD.util.ResourceReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +22,19 @@ public class MailSendingService {
 
     public void sendMail(String to, String firmName, String fio) {
         SimpleMailMessage message = new SimpleMailMessage();
+        String subject = Try.of(() -> resourceReader.getSubject(firmName))
+                .onFailure(throwable -> log.error("Error for getting subject", throwable))
+                .getOrElse("");
+        String text = Try.of(() -> resourceReader.getMailMessage(fio))
+                .onFailure(throwable -> log.error("Error for getting text", throwable))
+                .getOrElse("");
         message.setFrom(from);
         message.setTo(to);
-        message.setSubject(resourceReader.getSubject(firmName));
-        message.setText(resourceReader.getMailMessage(fio));
-        log.info("Send email message:\nFrom:{},\nTo:{},\nSubject:{},\nMessage:{}", from, to, message.getSubject(), message.getText());
-        emailSender.send(message);
+        message.setSubject(subject);
+        message.setText(text);
+        if (!subject.equals("") && !text.equals("")) {
+            log.info("Send email message:\nFrom:{},\nTo:{},\nSubject:{},\nMessage:{}", from, to, message.getSubject(), message.getText());
+            Try.run(() -> emailSender.send(message)).onFailure(throwable -> log.error("Error for sending message", throwable)).get();
+        }
     }
 }

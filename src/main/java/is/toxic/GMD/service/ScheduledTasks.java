@@ -1,5 +1,6 @@
 package is.toxic.GMD.service;
 
+import io.vavr.control.Try;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,19 +24,19 @@ public class ScheduledTasks {
     private final MailSendingService sendingService;
     private final GosbaseService gosbaseService;
 
-    @Scheduled(cron = "10 * * * * *")
+    @Scheduled(cron = "* 10 * * * *")
     public void distributeOffers() {
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
             value.getAndIncrement();
             Arrays.stream(trades)
                     .forEach(trade ->
+                            Try.runRunnable(() ->
                             sendingService.sendMail(
                                     gosbaseService.getEmail(trade),
                                     gosbaseService.getFirmName(trade),
-                                    gosbaseService.getFIO(trade)
-
-                            )
+                                    gosbaseService.getFIO(trade))
+                            ).getOrNull()
                     );
             trades = gosbaseService.getTradesPage(value.get());
         }
