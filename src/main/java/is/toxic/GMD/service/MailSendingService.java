@@ -33,7 +33,8 @@ public class MailSendingService {
         message.setSubject(subject);
         message.setText(text);
         if (!subject.equals("") && !text.equals("")) {
-            log.info("Send email message:\nFrom:{},\nTo:{},\nSubject:{},\nMessage:{}", from, to, message.getSubject(), message.getText());
+            log.info("Send email message:From:{},To:{},Subject:{}", from, to, message.getSubject());
+            log.debug("Message:{}", message.getText());
             Try.run(() -> emailSender.send(message)).onFailure(throwable -> log.error("Error for sending message", throwable)).get();
         }
     }
