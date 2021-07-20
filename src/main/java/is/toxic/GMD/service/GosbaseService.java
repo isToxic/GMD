@@ -3,17 +3,15 @@ package is.toxic.GMD.service;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.*;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -28,10 +26,17 @@ public class GosbaseService {
     @Value("${GMD.apikey}")
     private String apikey;
 
+    @Value("${GMD.min-guarantee}")
+    private long minGuarantee;
+    @Value("${GMD.max-guarantee}")
+    private long maxGuarantee;
+
 
     public GosbaseTradeResponse[] getTradesPage(int page) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
         builder.queryParam("page", page);
+        builder.queryParam("guarantee", minGuarantee);
+        builder.queryParam("guarantee_to", maxGuarantee);
         builder.queryParam("key", apikey);
         builder.queryParam("sort", SORT);
 

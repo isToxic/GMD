@@ -25,6 +25,9 @@ logging:
       max-file-size: 20MB
       max-history: 30
 GMD:
+  min-guarantee: 50000
+  max-guarantee: 50000000
+  max-in-day: 400
   gosbase-url: https://gosbase.ru/v1/api/online/
   distribution-on: true
   apikey: d428e943654ed9c66a1b22ca8fece014

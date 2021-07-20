@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,14 +29,28 @@ public class MailSendingService {
     @Value("${spring.mail.username}")
     private String from;
 
+    @Value("${GMD.max-in-day}")
+    private int maxInDay;
+
+    private AtomicInteger sended = new AtomicInteger();
+
+    @Scheduled(cron = "0 0 * * * *", zone = "Europe/Moscow")
+    public void dropActualSendedMails() {
+        log.info("reset sended num to 0");
+        sended.set(0);
+    }
+
     public void sendMail(GosbaseTradeResponse... tradeResponses) {
         Try.of(() -> getMessagesForSend(tradeResponses))
                 .andThen(simpleMailMessages ->
-                        simpleMailMessages.forEach(simpleMailMessage ->
-                                Try.run(() -> Thread.sleep(1500L))
-                                        .andThen(() -> emailSender.send(simpleMailMessage))
-                                        .onSuccess(unused -> log.info("Success send message to server"))
-                                        .get())
+                        simpleMailMessages.forEach(simpleMailMessage -> {
+                            if (sended.getAndIncrement() <= maxInDay) {
+                                Try.run(() -> emailSender.send(simpleMailMessage))
+                                        .onSuccess(unused ->
+                                                log.info("Success send message to server, sended mails={}", sended.get()))
+                                        .get();
+                            }
+                        })
                 )
                 .onSuccess(unused -> log.info("Success send all messages to server"))
                 .onFailure(throwable -> log.error("Error for sending message", throwable))

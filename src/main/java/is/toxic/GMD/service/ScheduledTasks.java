@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,12 @@ public class ScheduledTasks {
     private final MailSendingService sendingService;
     private final GosbaseService gosbaseService;
 
+    @Scheduled(cron = "0 0 * * * *", zone = "Europe/Moscow")
+    public void dropActualPageNum() {
+        log.info("reset pages num to 0");
+        value.set(0);
+    }
+
     @Scheduled(cron = "0 */10 * * * *")
     public void distributeOffers() {
         List<GosbaseTradeResponse> messages = new ArrayList<>();
@@ -34,12 +41,14 @@ public class ScheduledTasks {
             trades = gosbaseService.getTradesPage(value.get());
         }
         log.info("Start preparing messages for sending: {}", messages.size());
+        messages = filterRequired(messages);
+        log.info("Preparing messages for sending after require filer: {}", messages.size());
         sendingService.sendMail(messages.toArray(messages.toArray(new GosbaseTradeResponse[0])));
     }
 
-    @Scheduled(cron = "0 0 * * * *", zone = "Europe/Moscow")
-    public void dropActualPageNum() {
-        log.info("reset pages num to 0");
-        value.set(0);
+    private List<GosbaseTradeResponse> filterRequired(@NonNull List<GosbaseTradeResponse> messages) {
+        return messages.stream()
+                .filter(response -> response.getNot_required() == 0)
+                .toList();
     }
 }
