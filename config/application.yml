@@ -1,9 +1,9 @@
 spring:
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${email}
-    password: ${password}
+    host: smtp.elasticemail.com
+    port: 2525
+    username: for-you@kingofgarant.ru
+    password: 33DA078A0EC9C847707267F58A8530E17BAB
     properties:
       mail:
         smtp:
@@ -27,8 +27,7 @@ logging:
 GMD:
   min-guarantee: 50000
   max-guarantee: 50000000
-  max-in-day: 400
+  max-in-day: 100
   gosbase-url: https://gosbase.ru/v1/api/online/
-  distribution-on: true
   apikey: d428e943654ed9c66a1b22ca8fece014
   mail-subject: для FIRM_NAME - Предложение по предоставлению банковских гарантий (от 1,5% годовых) как на участие, так и на исполнение и на кредитование (от 13% годовых) в рамках 44, 223 и 185-ФЗ (615-ПП) с максимальной величиной лимита до 3 миллиардов рублей
