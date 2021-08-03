@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -45,13 +46,11 @@ public class MailSendingService {
                         log.debug("Can`t add message for sending, limit={}, now={}", maxInDay, sendInDay.get());
                         return;
                     }
-                    Try.run(() ->
-                                    log.warn("sended"))
-//                                            emailSender.send(messagesForSending.toArray(new SimpleMailMessage[0])))
-                            .onSuccess(unused ->
-                                    log.info("Success send message to server, sended mails= {}", messagesForSending.size()))
-                            .onFailure(throwable -> log.error("Error for sending message", throwable))
-                            .get();
+//                    Try.run(() -> emailSender.send(messagesForSending.toArray(new SimpleMailMessage[0])))
+//                            .onSuccess(unused ->
+//                                    log.info("Success send message to server, sended mails= {}", messagesForSending.size()))
+//                            .onFailure(throwable -> log.error("Error for sending message", throwable))
+//                            .get();
                 }
         );
     }

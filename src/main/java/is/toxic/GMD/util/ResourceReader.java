@@ -21,13 +21,13 @@ public class ResourceReader {
     private String mailSubject;
 
     @NonNull
-    public String getMailMessage(@NonNull String fio) {
+    public String getMailMessage(@NonNull String fio, @NonNull String email) {
         if (fio.isBlank()){
             return offerText().replace("IO", "уважаемый директор, предпрениматель");
         }
         String[] fioArray = fio.split(" ");
         String replaceResult = Try.of(()->fioArray[1].concat(" ").concat(fioArray[2])).getOrElse("уважаемый директор, предпрениматель");
-        return offerText().replace("IO", replaceResult);
+        return offerText().replace("IO", replaceResult).replace("EMAIL", email);
     }
 
     public String getSubject(@NonNull String firmName) {
@@ -45,7 +45,7 @@ public class ResourceReader {
     @Bean
     public String offerText(){
         ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("file:config/offer.txt");
+        Resource resource = resourceLoader.getResource("/email/email.html");
         return asString(resource);
     }
 }

@@ -2,6 +2,8 @@ package is.toxic.GMD.service;
 
 import io.vavr.control.Try;
 import is.toxic.GMD.DTO.GosbaseTradeResponse;
+import is.toxic.GMD.entity.MailEntity;
+import is.toxic.GMD.repository.MailsRepository;
 import is.toxic.GMD.util.ResourceReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class MessageService {
-
     private final ResourceReader resourceReader;
+    private final MailsRepository repository;
 
     @Value("${spring.mail.username}")
     private String from;
@@ -32,20 +35,42 @@ public class MessageService {
         String mail = Try.of(() -> getEmail(gosbaseTradeResponse))
                 .onFailure(throwable -> log.error("Error for getting email", throwable))
                 .getOrElse("");
+
+        if (repository.existsEmailsByEmailAndUnsubscribe(mail, true)){
+            log.info("Mail: {} in unsubcribe list, skip message", mail);
+            return null;
+        }
+        if (repository.existsById(mail)){
+            log.info("Mail: {} in send yet list, skip message", mail);
+            return null;
+        }
+
         String subject = Try.of(() -> resourceReader.getSubject(getFirmName(gosbaseTradeResponse)))
                 .onFailure(throwable -> log.error("Error for getting subject", throwable))
                 .getOrElse("");
-        String text = Try.of(() -> resourceReader.getMailMessage(getFIO(gosbaseTradeResponse)))
+
+        String text = Try.of(() -> resourceReader.getMailMessage(getFIO(gosbaseTradeResponse), mail))
                 .onFailure(throwable -> log.error("Error for getting text", throwable))
                 .getOrElse("");
+
         if (!subject.equals("") && !text.equals("") && !mail.equals("")) {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(from);
-            message.setTo(mail);
+            message.setTo("helpdesk@kingofgarant.ru");
             message.setSubject(subject);
             message.setText(text);
             log.info("Create email message:From:{},To:{},Subject:{}", from, mail, subject);
             log.debug("Message:\n{}", text);
+
+            MailEntity forSave = new MailEntity();
+            forSave.setAddingData(Instant.now());
+            forSave.setUnsubscribe(false);
+            forSave.setEmail(mail);
+
+            Try.run(() -> repository.save(forSave))
+                    .onSuccess(unused -> log.info("email: {}, saved", mail))
+                    .getOrNull();
+
             return message;
         } else {
             if (subject.equals("")) {
