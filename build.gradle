@@ -32,7 +32,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
     implementation 'org.springframework.boot:spring-boot-starter-parent:2.5.3'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.3'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.5.3'
     implementation 'org.springframework.boot:spring-boot-starter-mail:2.5.3'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.3'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.3'

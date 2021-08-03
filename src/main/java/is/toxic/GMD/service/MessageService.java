@@ -10,10 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.mail.internet.MimeMessage;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +28,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MessageService {
     private final ResourceReader resourceReader;
     private final MailsRepository repository;
+    private final JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
     private String from;
 
-    public SimpleMailMessage getMimeMessage(GosbaseTradeResponse gosbaseTradeResponse, AtomicInteger subErrors,
+    public MimeMessage getMimeMessage(GosbaseTradeResponse gosbaseTradeResponse, AtomicInteger subErrors,
                                             AtomicInteger mailErrors, AtomicInteger textErrors) {
         String mail = Try.of(() -> getEmail(gosbaseTradeResponse))
                 .onFailure(throwable -> log.error("Error for getting email", throwable))
@@ -54,11 +57,15 @@ public class MessageService {
                 .getOrElse("");
 
         if (!subject.equals("") && !text.equals("") && !mail.equals("")) {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(from);
-            message.setTo("helpdesk@kingofgarant.ru");
-            message.setSubject(subject);
-            message.setText(text);
+
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            Try.of(() -> new MimeMessageHelper(mimeMessage, "utf-8"))
+                    .andThenTry(helper -> helper.setText(text, true))
+                    .andThenTry(helper -> helper.setTo(mail))
+                    .andThenTry(helper -> helper.setSubject(subject))
+                    .andThenTry(helper -> helper.setFrom(from)).get();
+
             log.info("Create email message:From:{},To:{},Subject:{}", from, mail, subject);
             log.debug("Message:\n{}", text);
 
@@ -71,7 +78,7 @@ public class MessageService {
                     .onSuccess(unused -> log.info("email: {}, saved", mail))
                     .getOrNull();
 
-            return message;
+            return mimeMessage;
         } else {
             if (subject.equals("")) {
                 subErrors.getAndIncrement();
