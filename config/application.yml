@@ -37,7 +37,7 @@ logging:
     is.toxic: info
     org.springframework.integration.handler.LoggingHandler: off
   file:
-    name: /opt/GMD/logs
+    name: /opt/GMD/logs/GMD.log
   logback:
     rollingpolicy:
       max-file-size: 20MB
