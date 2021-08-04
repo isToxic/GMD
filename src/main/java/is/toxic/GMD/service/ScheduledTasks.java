@@ -53,7 +53,7 @@ public class ScheduledTasks {
         repository.deleteAllById(mailsForDelete);
     }
 
-    @Scheduled(cron = "0 0/10 8-20 * * ?", zone = "Europe/Moscow")
+    @Scheduled(fixedDelay = 999999L)
     public void distributeOffers() {
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
