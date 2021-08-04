@@ -62,7 +62,7 @@ public class MessageService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             Try.of(() -> new MimeMessageHelper(mimeMessage, "utf-8"))
                     .andThenTry(helper -> helper.setText(text, true))
-                    .andThenTry(helper -> helper.setTo("test-a601nacj6@srv1.mail-tester.com"))
+                    .andThenTry(helper -> helper.setTo(mail))
                     .andThenTry(helper -> helper.setSubject(subject))
                     .andThenTry(helper -> helper.setFrom(from)).get();
 

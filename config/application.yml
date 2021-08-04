@@ -47,7 +47,7 @@ GMD:
   storage-unit: Weeks
   min-guarantee: 50000
   max-guarantee: 50000000
-  max-in-day: 1
+  max-in-day: 100
   gosbase-url: https://gosbase.ru/v1/api/online/
   apikey: d428e943654ed9c66a1b22ca8fece014
   mail-subject: для FIRM_NAME - Предложение по предоставлению банковских гарантий
