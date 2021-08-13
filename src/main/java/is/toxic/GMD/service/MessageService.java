@@ -10,17 +10,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.mail.internet.MimeMessage;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -33,68 +33,81 @@ public class MessageService {
     @Value("${spring.mail.username}")
     private String from;
 
-    public MimeMessage getMimeMessage(GosbaseTradeResponse gosbaseTradeResponse, AtomicInteger subErrors,
-                                            AtomicInteger mailErrors, AtomicInteger textErrors) {
+    @NonNull
+    public void prepareMessagesForSend(GosbaseTradeResponse... tradeResponses) {
+        Arrays.stream(tradeResponses).forEach(trade -> Try.runRunnable(() -> prepareMessageData(trade)).getOrNull());
+        log.info("For create prepared: {}", tradeResponses.length);
+    }
+
+    public MimeMessage getMessage(String mail, String text, String subject) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        Try.of(() -> new MimeMessageHelper(mimeMessage, "utf-8"))
+                .andThenTry(helper -> helper.setText(text, true))
+                .andThenTry(helper -> helper.setTo(mail))
+                .andThenTry(helper -> helper.setSubject(subject))
+                .andThenTry(helper -> helper.setFrom(from)).get();
+        return mimeMessage;
+    }
+
+    public void prepareMessageData(GosbaseTradeResponse gosbaseTradeResponse) {
         String mail = Try.of(() -> getEmail(gosbaseTradeResponse))
                 .onFailure(throwable -> log.error("Error for getting email", throwable))
                 .getOrElse("");
-
-        if (repository.existsEmailsByEmailAndUnsubscribe(mail, true)){
-            log.info("Mail: {} in unsubcribe list, skip message", mail);
-            return null;
+        if (mail.equals("")) {
+            return;
         }
-        if (repository.existsById(mail)){
+        if (repository.existsEmailsByEmailAndUnsubscribe(mail, true)) {
+            log.info("Mail: {} in unsubscribe list, skip message", mail);
+            return;
+        }
+        if (repository.existsEmailsByEmailAndSendYet(mail, true)) {
             log.info("Mail: {} in send yet list, skip message", mail);
-            return null;
+            return;
         }
+        createAndSaveMessageData(getFirmName(gosbaseTradeResponse), getFIO(gosbaseTradeResponse), mail);
+    }
 
-        String subject = Try.of(() -> resourceReader.getSubject(getFirmName(gosbaseTradeResponse)))
+    @Nullable
+    private void createAndSaveMessageData(String firmName, String fio, String mail) {
+
+        String subject = Try.of(() -> resourceReader.getSubject(firmName))
                 .onFailure(throwable -> log.error("Error for getting subject", throwable))
                 .getOrElse("");
 
-        String text = Try.of(() -> resourceReader.getMailMessage(getFIO(gosbaseTradeResponse), mail))
+        String text = Try.of(() -> resourceReader.getMailMessage(fio, mail))
                 .onFailure(throwable -> log.error("Error for getting text", throwable))
                 .getOrElse("");
 
-        if (!subject.equals("") && !text.equals("") && !mail.equals("")) {
-
-
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            Try.of(() -> new MimeMessageHelper(mimeMessage, "utf-8"))
-                    .andThenTry(helper -> helper.setText(text, true))
-                    .andThenTry(helper -> helper.setTo(mail))
-                    .andThenTry(helper -> helper.setSubject(subject))
-                    .andThenTry(helper -> helper.setFrom(from)).get();
-
-            log.info("Create email message:From:{},To:{},Subject:{}", from, mail, subject);
-            log.debug("Message:\n{}", text);
-
-            MailEntity forSave = new MailEntity();
-            forSave.setAddingData(Instant.now());
-            forSave.setUnsubscribe(false);
-            forSave.setEmail(mail);
-
-            Try.run(() -> repository.save(forSave))
-                    .onSuccess(unused -> log.info("email: {}, saved", mail))
-                    .getOrNull();
-
-            return mimeMessage;
-        } else {
-            if (subject.equals("")) {
-                subErrors.getAndIncrement();
-            }
-            if (mail.equals("")) {
-                mailErrors.getAndIncrement();
-            }
-            if (text.equals("")) {
-                textErrors.getAndIncrement();
-            }
-            log.error("Error creating message for trade egrul: {}",
-                    gosbaseTradeResponse.getEgrul() == null ? "null" : gosbaseTradeResponse.getEgrul().toString()
-            );
-            log.error("mail ={}, subject = {}, has text =\n{}", mail, subject, StringUtils.hasText(text));
+        if (subject.equals("")) {
+            log.error("Error for creating message on subject");
+            return;
         }
-        return null;
+        if (mail.equals("")) {
+            log.error("Error for creating message on email");
+            return;
+        }
+        if (text.equals("")) {
+            log.error("Error for creating message on text");
+            return;
+        }
+
+        MailEntity forSave = new MailEntity();
+        forSave.setAddingData(Instant.now());
+        forSave.setUnsubscribe(false);
+        forSave.setEmail(mail);
+        forSave.setFio(fio);
+        forSave.setOrganisation(firmName);
+        forSave.setMessage(text);
+        forSave.setSubject(subject);
+        forSave.setSendYet(false);
+
+        if (!repository.existsById(mail)) {
+            Try.run(() -> repository.save(forSave))
+                    .onSuccess(unused -> log.info("Offer with email: {}, fio: {}, organisation: {}, saved", mail, fio, firmName))
+                    .getOrNull();
+        } else {
+            log.info("mail: {} exist in db", mail);
+        }
     }
 
     @NonNull

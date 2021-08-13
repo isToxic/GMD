@@ -12,5 +12,9 @@ public interface MailsRepository extends CrudRepository<MailEntity, String> {
 
     boolean existsEmailsByEmailAndUnsubscribe(String email, boolean unsubscribe);
 
+    boolean existsEmailsByEmailAndSendYet(String email, boolean sendYet);
+
     List<MailEntity> findByAddingDataBetween(Instant from, Instant to);
+
+    List<MailEntity> findTop50ByUnsubscribeAndSendYetAndSubjectNotNullAndMessageNotNullOrderByAddingData(boolean unsubscribe, boolean sendYet);
 }
