@@ -51,7 +51,7 @@ public class ScheduledTasks {
     public void clearSended() {
         log.info("clear emails older 1 week");
         List<String> mailsForDelete =
-                repository.findByAddingDataBetween(Instant.now().minus(storageTime, ChronoUnit.valueOf(unit)), Instant.now())
+                repository.findBySendYetAndUnsubscribeAndAddingDataBetween(true, false, Instant.now().minus(storageTime, ChronoUnit.valueOf(unit)), Instant.now())
                         .stream()
                         .filter(mailEntity -> !mailEntity.isUnsubscribe())
                         .map(MailEntity::getEmail)
