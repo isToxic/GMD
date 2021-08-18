@@ -43,8 +43,9 @@ logging:
       max-file-size: 20MB
       max-history: 30
 GMD:
-  storage-time: 1
-  storage-unit: Weeks
+  max-in-cache: 200
+  storage-time: 2
+  storage-unit: Days
   min-guarantee: 50000
   max-guarantee: 50000000
   max-in-day: 20

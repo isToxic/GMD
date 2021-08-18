@@ -33,6 +33,9 @@ public class MessageService {
     @Value("${spring.mail.username}")
     private String from;
 
+    @Value("${GMD.max-in-cache}")
+    private long maxInCache;
+
     @NonNull
     public void prepareMessagesForSend(GosbaseTradeResponse... tradeResponses) {
         Arrays.stream(tradeResponses).forEach(trade -> Try.runRunnable(() -> prepareMessageData(trade)).getOrNull());
@@ -62,6 +65,11 @@ public class MessageService {
         }
         if (repository.existsEmailsByEmailAndSendYet(mail, true)) {
             log.info("Mail: {} in send yet list, skip message", mail);
+            return;
+        }
+        long taskCount = repository.countByUnsubscribe(false);
+        if (taskCount >= maxInCache){
+            log.info("Mail: {} not add. Reason: db has max tasks for send. Max:{}, actual:{}, ", mail, maxInCache, taskCount);
             return;
         }
         createAndSaveMessageData(getFirmName(gosbaseTradeResponse), getFIO(gosbaseTradeResponse), mail);
