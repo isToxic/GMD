@@ -46,25 +46,23 @@ public class MailSendingService {
         entitiesForSending = entitiesForSending.size() <= maxInPack ? entitiesForSending : entitiesForSending.subList(0, maxInPack);
         if (entitiesForSending.size() > 0) {
             entitiesForSending.forEach(mailEntity -> {
-                        if (sendInDay.getAndIncrement() < maxInDay && messagesForSending.size() < maxInPack) {
-                            MimeMessage forSend = messageService.getMessage(mailEntity.getEmail(), mailEntity.getMessage(), mailEntity.getSubject());
-                            messagesForSending.add(forSend);
-                            log.debug("Add message #{} for sending", sendInDay.get());
-                        } else {
-                            log.debug("Can`t add message for sending, limit={}, now={}", maxInDay, sendInDay.get());
-                            return;
-                        }
-                        Try.run(() -> emailSender.send(messagesForSending.toArray(new MimeMessage[0])))
-                                .onSuccess(unused -> {
-                                    log.info("Success send message to server, send mails= {}", messagesForSending.size());
-                                    messagesForSending.forEach(mimeMessage ->
-                                            setEmailAsSendYet(Try.of(mimeMessage::getAllRecipients).get()[0].toString())
-                                    );
-                                })
-                                .onFailure(throwable -> log.error("Error for sending message", throwable))
-                                .get();
-                    }
-            );
+                if (sendInDay.getAndIncrement() < maxInDay && messagesForSending.size() < maxInPack) {
+                    MimeMessage forSend = messageService.getMessage(mailEntity.getEmail(), mailEntity.getMessage(), mailEntity.getSubject());
+                    messagesForSending.add(forSend);
+                    log.debug("Add message #{} for sending", sendInDay.get());
+                } else {
+                    log.debug("Can`t add message for sending, limit={}, now={}", maxInDay, sendInDay.get());
+                }
+            });
+            Try.run(() -> emailSender.send(messagesForSending.toArray(new MimeMessage[0])))
+                    .onSuccess(unused -> {
+                        log.info("Success send message to server, send mails= {}", messagesForSending.size());
+                        messagesForSending.forEach(mimeMessage ->
+                                setEmailAsSendYet(Try.of(mimeMessage::getAllRecipients).get()[0].toString())
+                        );
+                    })
+                    .onFailure(throwable -> log.error("Error for sending message", throwable))
+                    .get();
         }
     }
 
