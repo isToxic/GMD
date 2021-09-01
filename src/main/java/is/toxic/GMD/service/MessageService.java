@@ -67,7 +67,7 @@ public class MessageService {
             log.info("Mail: {} in send yet list, skip message", mail);
             return;
         }
-        long taskCount = repository.countByUnsubscribe(false);
+        long taskCount = repository.countBySendYetAndUnsubscribe(false,false);
         if (taskCount >= maxInCache){
             log.info("Mail: {} not add. Reason: db has max tasks for send. Max:{}, actual:{}, ", mail, maxInCache, taskCount);
             return;

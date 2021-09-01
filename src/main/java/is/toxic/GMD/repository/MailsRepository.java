@@ -14,7 +14,7 @@ public interface MailsRepository extends CrudRepository<MailEntity, String> {
 
     boolean existsEmailsByEmailAndSendYet(String email, boolean sendYet);
 
-    long countByUnsubscribe(boolean unsubscribe);
+    long countBySendYetAndUnsubscribe(boolean sendYet, boolean unsubscribe);
 
     List<MailEntity> findBySendYetAndUnsubscribeAndAddingDataBetween(boolean sendYet, boolean unsubscribe, Instant from, Instant to);
 

@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -49,9 +50,11 @@ public class ScheduledTasks {
     @Async
     @Scheduled(cron = "0 0 0 * * ?", zone = "Europe/Moscow")
     public void clearSended() {
-        log.info("clear emails older 1 week");
+        log.info("clear emails older {} {}", storageTime, unit);
+        Instant from = Instant.now().minus(storageTime, ChronoUnit.valueOf(unit.toUpperCase(Locale.ROOT)));
+        Instant to = Instant.now();
         List<String> mailsForDelete =
-                repository.findBySendYetAndUnsubscribeAndAddingDataBetween(true, false, Instant.now().minus(storageTime, ChronoUnit.valueOf(unit)), Instant.now())
+                repository.findBySendYetAndUnsubscribeAndAddingDataBetween(true, false, from, to)
                         .stream()
                         .filter(mailEntity -> !mailEntity.isUnsubscribe())
                         .map(MailEntity::getEmail)

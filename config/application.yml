@@ -43,13 +43,13 @@ logging:
       max-file-size: 20MB
       max-history: 30
 GMD:
-  max-in-cache: 200
+  max-in-cache: 2000
   storage-time: 2
   storage-unit: Days
   min-guarantee: 50000
   max-guarantee: 50000000
-  max-in-day: 50
+  max-in-day: 70
   max-in-pack: 5
   gosbase-url: https://gosbase.ru/v1/api/online/
   apikey: d428e943654ed9c66a1b22ca8fece014
-  mail-subject: Для FIRM_NAME, предложение по предоставлению банковских гарантий (от 1.5% или 13%)
+  mail-subject: Для FIRM_NAME, предложение по предоставлению банковских гарантий
