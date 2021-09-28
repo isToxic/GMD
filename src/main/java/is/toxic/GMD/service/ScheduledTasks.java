@@ -80,7 +80,7 @@ public class ScheduledTasks {
     }
 
     @Async
-    @Scheduled(cron = "0 0/5 7-21 * * ?", zone = "Europe/Moscow")
+    @Scheduled(cron = "0 0/5 14-17 * * ?", zone = "Europe/Moscow")
     public void distributeOffers() {
         log.info("Start distribution task");
         sendingService.sendOffers();
