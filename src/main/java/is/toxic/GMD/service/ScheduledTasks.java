@@ -63,7 +63,7 @@ public class ScheduledTasks {
     }
 
     @Async
-    @Scheduled(cron = "0 0/10 8-20 * * ?", zone = "Europe/Moscow")
+    @Scheduled(cron = "0 0/10 9-18 * * ?", zone = "Europe/Moscow")
     public void prepareOffers() {
         GosbaseTradeResponse[] trades = gosbaseService.getTradesPage(value.get());
         while (trades.length != 0) {
@@ -80,7 +80,7 @@ public class ScheduledTasks {
     }
 
     @Async
-    @Scheduled(cron = "0 0/5 14-17 * * ?", zone = "Europe/Moscow")
+    @Scheduled(cron = "0 0/5 11-17 * * ?", zone = "Europe/Moscow")
     public void distributeOffers() {
         log.info("Start distribution task");
         sendingService.sendOffers();
